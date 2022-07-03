@@ -205,8 +205,6 @@ def EX():
             out = ~(aluA | aluB)
         elif funct == G_UTL.rTypeWords['mult']:
             out = aluA * aluB
-        elif funct == G_UTL.rTypeWords['div']:
-            out = aluA // aluB
     G_MEM.EX_MEM['ALU_OUT'] = out
 
     # Set EX/MEM.B
@@ -230,35 +228,11 @@ def MEM():
 
     # Set MEM/WB.LMD (read from Data Memory)
     if G_MEM.EX_MEM_CTRL['MEM_READ'] == 1:
-        # The simulation memory might not be big enough
-        if G_MEM.EX_MEM['ALU_OUT'] // 4 < G_UTL.DATA_SIZE:
-            G_MEM.MEM_WB['LMD'] = G_MEM.DATA[G_MEM.EX_MEM['ALU_OUT'] // 4]
-        else:
-            print('***WARNING***')
-            print(f'\tMemory Read at position {G_MEM.EX_MEM["ALU_OUT"]} not executed:')
-            print(f'\t\tMemory only has {G_UTL.DATA_SIZE * 4} positions.')
-
-            try:
-                input('Press ENTER to continue execution or abort with CTRL-C. ')
-            except KeyboardInterrupt:
-                print('Execution aborted.')
-                exit()
+        G_MEM.MEM_WB['LMD'] = G_MEM.DATA[G_MEM.EX_MEM['ALU_OUT'] // 4]
 
     # Write to Data Memory
     if G_MEM.EX_MEM_CTRL['MEM_WRITE'] == 1:
-        # The simulation memory might not be big enough
-        if G_MEM.EX_MEM['ALU_OUT'] // 4 < G_UTL.DATA_SIZE:
-            G_MEM.DATA[G_MEM.EX_MEM['ALU_OUT'] // 4] = G_MEM.EX_MEM['B']
-        else:
-            print('***WARNING***')
-            print(f'\tMemory Write at position {G_MEM.EX_MEM["ALU_OUT"]} not executed:')
-            print(f'\t\tMemory only has {G_UTL.DATA_SIZE * 4} positions.')
-
-            try:
-                input('Press ENTER to continue execution or abort with CTRL-C. ')
-            except KeyboardInterrupt:
-                print('Execution aborted.')
-                exit()
+        G_MEM.DATA[G_MEM.EX_MEM['ALU_OUT'] // 4] = G_MEM.EX_MEM['B']
 
     # Set MEM/WB.ALUOut
     G_MEM.MEM_WB['ALU_OUT'] = G_MEM.EX_MEM['ALU_OUT']

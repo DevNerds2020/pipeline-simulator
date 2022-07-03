@@ -15,7 +15,7 @@ sw $t5, 8($zero)        # Copy $t5 to memory[8]
 # Verify that the results are correct
 # memory[8] = 240*(15+240) = 61200 = 0xEF10
 
-lw $s0, 8($zero)  
+lw $s0, 8($zero)
 addi, $s1, $zero, 61200
 addi $s7, $zero, 1
 beq $s0, $s1, 1

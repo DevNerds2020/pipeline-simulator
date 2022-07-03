@@ -8,12 +8,9 @@ import utils
 
 
 def main():
-    try:
-        filename = next(arg for arg in sys.argv[1:] if not arg.startswith('-'))
-    except StopIteration:
-        filename = 'program.txt'
+    filename = 'test1.txt'
 
-    # Read .asm
+    # Read
     program = utils.readFile(filename)
     programLength = len(program)
 
@@ -22,40 +19,18 @@ def main():
         # Remove comments
         if not program[i] or program[i][0] == '#': continue
         encoded = instTranslator.encode(program[i].split('#')[0])
-
-        # Detect errors, if none then continue loading
-        # if encoded not in G_UTL.ERROR:
         G_MEM.INST.append(encoded)
-        # else:
-        #     print(f'ERROR @ \'{filename}\':')
-        #     print(f'\tLine {i + 1}: \'{program[i]}\'')
-        #     if encoded == G_UTL.EINST:
-        #         print('\t\tCouldn\'t parse the instruction')
-        #     elif encoded == G_UTL.EARG:
-        #         print('\t\tCouldn\'t parse one or more arguments')
-        #     elif encoded == G_UTL.EFLOW:
-        #         print('\t\tOne or more arguments are under/overflowing')
-        #     return
 
     # Print the program as loaded
     utils.printInstMem()
     print()
-
-    # # Doesn't print memory after each clock
-    # silent = ('-s' in sys.argv)
-    #
-    # # Skips clock stepping
-    # skipSteps = silent
 
     # Run simulation, will run until all pipeline stages are empty
     clkHistory = []
     clk = 0
     while clk == 0 or (
             G_UTL.ran['IF'][1] != 0 or G_UTL.ran['ID'][1] != 0 or G_UTL.ran['EX'][1] != 0 or G_UTL.ran['MEM'][1] != 0):
-        # # if silent:
         print(' '.join(['─' * 20, f'CLK #{clk}', '─' * 20]))
-        # # else:
-        # print(' '.join(['─' * 38, f'CLK #{clk}', '─' * 38]))
 
         clkHistory.append([])
 
@@ -85,20 +60,8 @@ def main():
                     f'> Stage {stage}: #{G_UTL.ran[stage][0] * 4} = [{instTranslator.decode(G_UTL.ran[stage][1])}]{idle}.')
 
         utils.printPC()
-        # Print resulting memory
-        # if not silent:
-        #     print('─' * (83 + len(str(clk))))
-        #     utils.printPC()
-        #     if G_UTL.data_hzd or G_UTL.ctrl_hzd:
-        #         utils.printFwdAndHazard()
-        #     utils.printPipelineRegs()
-        #     utils.printRegMem()
-        #     utils.printDataMem()
-        #     print('─' * (83 + len(str(clk))))
         clk += 1
 
-        # Clock step prompt
-        # if not skipSteps:
         try:
             opt = input('| step: [ENTER] | end: [E|Q] | ').lower()
             skipSteps = (opt == 'e' or opt == 'q')
@@ -106,18 +69,15 @@ def main():
             print('\nExecution aborted.')
             exit()
 
-    # if silent:
     print()
-    # utils.printPipelineRegs()
-    # utils.printRegMem()
-    # utils.printDataMem()
-    #
 
     print()
     print(f'Program ran in {clk} clocks.')
     print()
 
     utils.printHistory(clkHistory)
+    print("register file => ", G_MEM.REGS)
+    print("memory file =>", G_MEM.DATA)
 
     return
 
